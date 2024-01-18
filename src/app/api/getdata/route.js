@@ -1,4 +1,5 @@
-import mysql from "mysql2/promise"
+//import mysql from "mysql2/promise"
+import { PrismaClient } from "@prisma/client";
 
 const connection = await mysql.createConnection({
     host: 'localhost',
