@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import {useState, useEffect} from "react"
 
 export default function Home() {
   const [assassin, setAssassin] = useState({
@@ -9,19 +9,65 @@ export default function Home() {
     address:"",
     gender:""
   })
+
+  /* useEffect(() => {
+    console.log("Opdateret Assassin-tilstand:", assassin);
+  }, [assassin]) */
+
+
   async function updateAssassin(ID:number) {
-    const response = await fetch('http://localhost:3000/api/getdata', {
-      method: "post", body: JSON.stringify({
-        ID:ID
-      })
-    })
-    const assassin = await response.json()
-    
-    if (assassin){
-      setAssassin(assassin.rows[0])
-      console.log(assassin)
+    try{
+      
+      const response = await fetch('http://localhost:3000/api/getdata', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Tilføj denne linje
+        },
+        body: JSON.stringify({
+          ID: ID,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Fejl ved hentning af data:", response.statusText);
+        // Implementer passende fejlhåndtering eller viser en fejlbesked til brugeren.
+        return;
+      }
+
+      const result = await response.json();
+
+      
+
+      if (result.success) {
+        // Find den korrekte person baseret på ID
+        const selectedAssassin = result.data.find(
+          (assassin) => assassin.ID === ID
+        );
+  
+        if (selectedAssassin) {
+          // Opdater state med dataene fra den valgte person
+          setAssassin(selectedAssassin);
+          console.log("Selected Assassin:", selectedAssassin);
+        } else {
+          console.error("Fejl: Assassin ikke fundet i dataresultatet");
+        }
+      } else {
+        console.error("Fejl ved hentning af data:", result.error);
+        // Implementer passende fejlhåndtering eller vis en fejlbesked til brugeren.
+      }
+    } catch (error) {
+      console.error("Der opstod en uventet fejl:", error);
+      // Implementer passende fejlhåndtering eller vis en fejlbesked til brugeren.
     }
-  }
+
+    // const assassin = await response.json()
+    
+    // if (assassin){
+    //   setAssassin(assassin.rows[0])
+    //   console.log(assassin)
+    // }
+  } 
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -41,7 +87,18 @@ export default function Home() {
         </div>
       </div>
 
-      {assassin.name} {assassin.phone} {assassin.address} {assassin.gender}
+      {assassin !== undefined && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Assassin Information</h2>
+          <p>Name: {assassin.Name || "Loading..."}</p>
+          <p>Phone: {assassin.Phone || "Loading..."}</p>
+          <p>Address: {assassin.Address || "Loading..."}</p>
+          <p>Gender: {assassin.Gender || "Loading..."}</p>
+        </div>
+      )}
+      {!assassin &&(
+        <p>Error Assassin data not available</p>
+      )}
 
       <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
 
