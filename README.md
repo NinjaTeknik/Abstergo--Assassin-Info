@@ -1,1 +1,1 @@
-Just a little fun project [Under Redesign] (first NEXT.js Project)
+Just a little fun project [Under Redesign & Translation to English] (first NEXT.js Project)
